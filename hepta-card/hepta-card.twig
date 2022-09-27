@@ -1,0 +1,27 @@
+{%
+  set component_classes = [
+    "hepta-card",
+    classes,
+    link|length > 0 ? "lib-big-target",
+  ]|join(' ')|trim
+%}
+<div class="{{ component_classes }}"{{_css_props}}>
+  <div class="hepta-card__media">{{ media }}</div>
+  <div class="hepta-card__content">
+    {% if heading %}
+    <div class="hepta-card__heading">
+      {{ heading }}
+    </div>
+    {% endif %}
+    {% if subheading %}
+    <div class="hepta-card__subheading">{{ subheading }}</div>
+    {% endif %}
+    {{ content }}
+  </div>
+  {% if link %}
+    <div class="hepta-card__footer">
+      <a class="hepta-card__button lib-big-target-link button button--naked button--arrow-right" href="{{ link }}">{{ link_title }}</a>
+    </div>
+  {% endif %}
+</div>
+{{ render_component('lib-big-target', {}) }}
