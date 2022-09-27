@@ -1,0 +1,1315 @@
+@use 'sass:math';
+@use 'sass:map';
+@use 'drupal-style';
+@use 'icons';
+@use "ptsans-bold.ttf.css";
+@use "ptsans-regular.ttf.css";
+
+
+//*** Functions and mixins:
+@function px-to-rem($px) {
+    $remValue: math.div($px, 16) + rem;
+    @return $remValue;
+}
+
+@function strip-unit($number) {
+    @return math.div($number, ($number * 0 + 1));
+}
+
+@function add-unit($number, $unit) {
+    @return $number * $unit;
+}
+
+// This function can take both unitless values and values with px units as arguments.
+@function fluid-size($min-value, $max-value) {
+    @if unitless($min-value) and unitless($max-value) {
+        @return clamp(
+            add-unit($min-value, 1px),
+            calc(
+                px-to-rem($min-value) + ($max-value - $min-value) *
+                    (
+                        (100vw - $fluid-min-width) /
+                            (
+                                strip-unit($fluid-max-width) -
+                                    strip-unit($fluid-min-width)
+                            )
+                    )
+            ),
+            add-unit($max-value, 1px)
+        );
+    } @else {
+        @return clamp(
+            $min-value,
+            calc(
+                px-to-rem(strip-unit($min-value)) +
+                    (strip-unit($max-value) - strip-unit($min-value)) *
+                    (
+                        (100vw - $fluid-min-width) /
+                            (
+                                strip-unit($fluid-max-width) -
+                                    strip-unit($fluid-min-width)
+                            )
+                    )
+            ),
+            $max-value
+        );
+    }
+}
+
+$fluid-min-width: 500px; // Sass variable - Used for fluid calculation.
+$fluid-max-width: 1280px; // Sass variable - Used for fluid calculation.
+
+$typography-sizes: (
+  '8xl': 100px,
+  '7xl': 80px,
+  '6xl': 60px,
+  '5xl': 50px,
+  '4xl': 42px,
+  '3xl': 38px,
+  '2xl': 32px,
+   'xl': 30px,
+    'l': 26px,
+    'm': 24px,
+    's': 22px,
+   'xs': 20px,
+  '2xs': 18px,
+  '3xs': 16px,
+  '4xs': 15px,
+  '5xs': 14px,
+  '6xs': 12px,
+);
+
+$font-sizes: (
+  'headline giant': fluid-size(60, 100),
+  'headline 1': fluid-size(42, 60),
+  'headline 2': fluid-size(30, 50),
+  'headline 3': fluid-size(26, 32),
+  'headline 4': fluid-size(18, 26),
+  'headline 5': fluid-size(18, 24),
+  'headline 6': fluid-size(18, 22),
+  'preamble': fluid-size(18, 22),
+  'body': fluid-size(15, 18),
+  'meny': fluid-size(18, 24),
+  'button': fluid-size(12, 18),
+  'summary': fluid-size(12, 14),
+  'caption': fluid-size(14, 18)
+);
+
+$line-heights: (
+  'headline giant': fluid-size(60, 80),
+  'headline 1': fluid-size(50, 60),
+  'headline 2': fluid-size(38, 60),
+  'headline 3': fluid-size(30, 38),
+  'headline 4': fluid-size(26, 32),
+  'headline 5': fluid-size(26, 30),
+  'headline 6': 26px,
+  'preamble': fluid-size(26, 32),
+  'body': fluid-size(22, 26),
+  'meny': fluid-size(18, 24),
+  'button': fluid-size(16, 18),
+  'summary': fluid-size(18, 20),
+  'caption': fluid-size(14, 18)
+);
+
+$font-weights: (
+  'normal': 400,
+  'bold': 700,
+);
+//Behöver ses över
+$spacings: (
+  "3xl": 128px,
+  "2xl": 96px,
+   "xl": 48px,
+    "l": 32px,    
+    "m": 24px,
+    "s": 16px,
+   "xs": 12px,
+  "2xs": 8px,
+  "3xs": 4px,
+);
+
+// *** Font weight classes:
+%font-weight-normal {
+  --font-weight: #{map.get($font-weights, 'normal')};
+}
+
+%font-weight-bold {
+  --font-weight: #{map.get($font-weights, 'bold')};
+}
+
+%css-font-weight-normal {
+  font-weight: #{map.get($font-weights, 'normal')};
+}
+
+%css-font-weight-bold {
+  font-weight: #{map.get($font-weights, 'bold')};
+}
+
+
+// //*** Font packages:
+//Kolla på om detta behövs senare
+%font-package--headline-giant {
+    --font-size: #{map.get($font-sizes, 'headline giant')};
+    --line-height: #{map.get($line-heights, 'headline giant')};
+    --font-weight: #{map.get($font-weights, 'bold')};
+    --font-family: var(--font-family-bold);
+    // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    --letter-spacing: 0px;
+}
+%css-font-package--headline-giant {
+    font-size: #{map.get($font-sizes, 'headline giant')};
+    line-height: #{map.get($line-heights, 'headline giant')};
+    font-weight: #{map.get($font-weights, 'bold')};
+    font-family: var(--font-family-bold);
+    // margin: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    letter-spacing: 0px;
+}
+
+%font-package--headline-1 {
+    --font-size: #{map.get($font-sizes, 'headline 1')};
+    --line-height: #{map.get($line-heights, 'headline 1')};
+    --font-weight: #{map.get($font-weights, 'normal')};
+    --font-family: var(--font-family-bold);
+    // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    --letter-spacing: 0px;
+}
+%css-font-package--headline-1 {
+    font-size: #{map.get($font-sizes, 'headline 1')};
+    line-height: #{map.get($line-heights, 'headline 1')};
+    font-weight: #{map.get($font-weights, 'normal')};
+    font-family: var(--font-family-bold);
+    // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    letter-spacing: 0px;
+}
+
+%font-package--headline-2 {
+    --font-size: #{map.get($font-sizes, 'headline 2')};
+    --line-height: #{map.get($line-heights, 'headline 2')};
+    --font-weight: #{map.get($font-weights, 'normal')};
+    --font-family: var(--font-family-bold);
+    // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    --letter-spacing: 0px;
+}
+%css-font-package--headline-2 {
+    font-size: #{map.get($font-sizes, 'headline 2')};
+    line-height: #{map.get($line-heights, 'headline 2')};
+    font-weight: #{map.get($font-weights, 'normal')};
+    font-family: var(--font-family-bold);
+    // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    letter-spacing: 0px;
+}
+
+%font-package--headline-3 {
+    --font-size: #{map.get($font-sizes, 'headline 3')};
+    --line-height: #{map.get($line-heights, 'headline 3')};
+    --font-weight: #{map.get($font-weights, 'normal')};
+    --font-family: var(--font-family-bold);
+    // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))} #{map.get($spacings, "xl")};
+    --letter-spacing: 0;
+}
+%css-font-package--headline-3 {
+    font-size: #{map.get($font-sizes, 'headline 3')};
+    line-height: #{map.get($line-heights, 'headline 3')};
+    font-weight: #{map.get($font-weights, 'normal')};
+    font-family: var(--font-family-bold);
+    // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))} #{map.get($spacings, "xl")};
+    letter-spacing: 0;
+}
+
+%font-package--headline-4 {
+    --font-size: #{map.get($font-sizes, 'headline 4')};
+    --line-height: #{map.get($line-heights, 'headline 4')};
+    --font-weight: #{map.get($font-weights, 'bold')};
+    --font-family: var(--font-family-bold);
+    // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))} #{map.get($spacings, "xl")};
+    --letter-spacing: 0;
+}
+%css-font-package--headline-4 {
+    font-size: #{map.get($font-sizes, 'headline 4')};
+    line-height: #{map.get($line-heights, 'headline 4')};
+    font-weight: #{map.get($font-weights, 'bold')};
+    font-family: var(--font-family-bold);
+    // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+    letter-spacing: 0;
+}
+%font-package--headline-5 {
+  --font-size: #{map.get($font-sizes, 'headline 5')};
+  --line-height: #{map.get($line-heights, 'headline 5')};
+  --font-weight: #{map.get($font-weights, 'bold')};
+  --font-family: var(--font-family-bold);
+  // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))} #{map.get($spacings, "xl")};
+  --letter-spacing: 0;
+}
+%css-font-package--headline-5 {
+  font-size: #{map.get($font-sizes, 'headline 5')};
+  line-height: #{map.get($line-heights, 'headline 5')};
+  font-weight: #{map.get($font-weights, 'bold')};
+  font-family: var(--font-family-bold);
+  // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+  letter-spacing: 0;
+}
+%font-package--headline-6 {
+  --font-size: #{map.get($font-sizes, 'headline 6')};
+  --line-height: #{map.get($line-heights, 'headline 6')};
+  --font-weight: #{map.get($font-weights, 'bold')};
+  --font-family: var(--font-family-bold);
+  // --vspace: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))} #{map.get($spacings, "xl")};
+  --letter-spacing: 0;
+}
+%css-font-package--headline-6 {
+  font-size: #{map.get($font-sizes, 'headline 6')};
+  line-height: #{map.get($line-heights, 'headline 6')};
+  font-weight: #{map.get($font-weights, 'bold')};
+  font-family: var(--font-family-bold);
+  // margin-block: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "4xl"))} #{map.get($spacings, "xl")};
+  letter-spacing: 0;
+}
+
+%font-package--preamble {
+    --font-size: #{map.get($font-sizes, 'preamble')};
+    --line-height: #{map.get($line-heights, 'preamble')};
+    --font-weight: #{map.get($font-weights, 'normal')};
+    --font-family: var(--font-family);
+    --letter-spacing: 0;
+}
+
+%css-font-package--preamble {
+    font-size: #{map.get($font-sizes, 'preamble')};
+    line-height: #{map.get($line-heights, 'preamble')};
+    font-weight: #{map.get($font-weights, 'normal')};
+    font-family: var(--font-family);
+    letter-spacing: 0;
+}
+
+
+%font-package--body {
+  --font-size: #{map.get($font-sizes, 'body')};
+  --line-height: #{map.get($line-heights, 'body')};
+  --font-weight: #{map.get($font-weights, 'normal')};
+  --font-family: var(--font-family);
+  --letter-spacing: 0;
+}
+
+%css-font-package--body {
+  font-size: #{map.get($font-sizes, 'body')};
+  line-height: #{map.get($line-heights, 'body')};
+  font-weight: #{map.get($font-weights, 'normal')};
+  font-family: var(--font-family);
+  letter-spacing: 0;
+}
+
+
+%font-package--meny {
+  --font-size: #{map.get($font-sizes, 'meny')};
+  --line-height: #{map.get($line-heights, 'meny')};
+  --font-weight: #{map.get($font-weights, 'bold')};
+  --font-family: var(--font-family-bold);
+  --letter-spacing: 0;
+}
+
+%css-font-package--meny {
+  font-size: #{map.get($font-sizes, 'meny')};
+  line-height: #{map.get($line-heights, 'meny')};
+  font-weight: #{map.get($font-weights, 'bold')};
+  font-family: var(--font-family-bold);
+  letter-spacing: 0;
+}
+
+
+%font-package--button {
+  --font-size: #{map.get($font-sizes, 'button')};
+  --line-height: #{map.get($line-heights, 'button')};
+  --font-weight: #{map.get($font-weights, 'bold')};
+  --font-family: var(--font-family-bold);
+  --letter-spacing: 0;
+}
+
+%css-font-package--button {
+  font-size: #{map.get($font-sizes, 'button')};
+  line-height: #{map.get($line-heights, 'button')};
+  font-weight: #{map.get($font-weights, 'bold')};
+  font-family: var(--font-family-bold);
+  letter-spacing: 0;
+}
+
+
+%font-package--summary {
+  --font-size: #{map.get($font-sizes, 'summary')};
+  --line-height: #{map.get($line-heights, 'summary')};
+  --font-weight: #{map.get($font-weights, 'normal')};
+  --font-family: var(--font-family);
+  --letter-spacing: 0;
+}
+
+%css-font-package--summary {
+  font-size: #{map.get($font-sizes, 'summary')};
+  line-height: #{map.get($line-heights, 'summary')};
+  font-weight: #{map.get($font-weights, 'normal')};
+  font-family: var(--font-family);
+  letter-spacing: 0;
+}
+
+
+%font-package--caption {
+  --font-size: #{map.get($font-sizes, 'caption')};
+  --line-height: #{map.get($line-heights, 'caption')};
+  --font-weight: #{map.get($font-weights, 'normal')};
+  --font-family: var(--font-family);
+  --text-transform: uppercase;
+  --letter-spacing: 2px;
+}
+
+%css-font-package--caption {
+  font-size: #{map.get($font-sizes, 'caption')};
+  line-height: #{map.get($line-heights, 'caption')};
+  font-weight: #{map.get($font-weights, 'normal')};
+  font-family: var(--font-family);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+
+
+
+/****************
+ * Color schemes *
+ ****************/
+
+%color-scheme-1 {
+  --background: var(--color-8);
+  --color-text: var(--color-6);
+  --color-link: var(--color-4);
+  --filter: var(--filter-to-color-black);
+  --input-field-background: transparent;
+}
+%color-scheme-2 {
+  --background: var(--color-7);
+  --color-text: var(--color-6);
+  --color-link: var(--color-4);
+  --filter: var(--filter-to-color-black);
+  --input-field-background: transparent;
+}
+%color-scheme-3 {
+  --background: rgba(0,0,0,.08);
+  --color-text: var(--color-6);
+  --color-link: var(--color-4);
+  --filter: var(--filter-to-color-black);
+  --input-field-background: transparent;
+}
+%color-scheme-4 {
+  --background: var(--color-3);
+  --color-text: var(--color-6);
+  --color-link: var(--color-1);
+  --filter: var(--filter-to-color-black);
+  --input-field-background: transparent;
+}
+%color-scheme-5 {
+  --background: var(--color-6);
+  --color-text: var(--color-7);
+  --color-link: var(--color-1);
+  --filter: var(--filter-to-color-white);
+  --input-field-background: var(--color-7);
+}
+//Used on header/footer
+%color-scheme-6 {
+  --background: var(--color-6);
+  --color-text: var(--color-7);
+  --color-link: var(--color-7);
+  --filter: var(--filter-to-color-white);
+  --input-field-background: var(--color-7);
+}
+
+//fix colors later. The importat thing is that --color-text is white.
+%color-scheme-media-background {
+  --background: var(--color-6);
+  --color-text: var(--color-7);
+  --color-link: var(--color-1);
+  --filter: var(--filter-to-color-white);
+  --input-field-background: var(--color-7);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.theme {
+  /****************************************************************
+   * Global settings.
+   * Override in your project.
+  ****************************************************************/
+
+  //*** Default custom properties:
+
+  --font-family:      "PTSansRegular";
+  --font-family-bold: "PTSansBold";
+  --font-style: normal;
+  --font-stretch: normal;
+  --text-align: left;
+  --text-decoration: none;
+
+  @extend %font-package--body;
+  @extend %color-scheme-1;
+
+  // --font-weight: 400;
+  // --font-weight-bold: 700;
+  // --font-size: var(--font-size-m);
+  // --line-height: 1.5;
+  // --letter-spacing: 0;
+  // --color-text-dark: #333;
+  // --color-text-light: #fff;
+  // --color-text: var(--color-text-dark);
+  // --color-background: transparent;
+
+  /****************************************************************
+   * COLOR
+  ****************************************************************/
+
+  /* Colors - Grays */
+  --color-white: #ffffff;
+  --color-white-rgb: 255 255 255;
+  --filter-to-color-white: brightness(0) saturate(100%) invert(100%);
+  --color-black: #000;
+  --color-black-rgb: 0 0 0;
+  --filter-to-color-black: brightness(0) saturate(100%);
+
+  /* Colors. */
+  // Filters https://codepen.io/sosuke/pen/Pjoqqp
+   /* Yellow */
+   --color-1:#FFDF30;
+   --color-1-rgb: #{red(#FFDF30), green(#FFDF30), blue(#FFDF30)};
+   --filter-to-color-1: brightness(0) saturate(100%) invert(81%) sepia(88%) saturate(938%) hue-rotate(328deg) brightness(106%) contrast(103%);
+ 
+   /* Olive */
+   --color-2: #636A30;
+   --color-2-rgb: #{red(#636A30), green(#636A30), blue(#636A30)};
+   --filter-to-color-2: brightness(0) saturate(100%) invert(36%) sepia(8%) saturate(2497%) hue-rotate(27deg) brightness(103%) contrast(89%);
+ 
+   /* Blue */
+   --color-3: #2DAFE6;
+   --color-3-rgb: #{red(#2DAFE6), green(#2DAFE6), blue(#2DAFE6)};
+   --filter-to-color-3: brightness(0) saturate(100%) invert(59%) sepia(39%) saturate(899%) hue-rotate(156deg) brightness(95%) contrast(90%);
+ 
+   /* Red */
+   --color-4: #E5231B;
+   --color-4-rgb: #{red(#E5231B), green(#E5231B), blue(#E5231B)};
+   --filter-to-color-4: brightness(0) saturate(100%) invert(32%) sepia(93%) saturate(7363%) hue-rotate(356deg) brightness(95%) contrast(88%);
+ 
+   /* Green */
+   --color-5: #B3BE11;
+   --color-5-rgb: #{red(#B3BE11), green(#B3BE11), blue(#B3BE11)};
+   --filter-to-color-5: brightness(0) saturate(100%) invert(89%) sepia(12%) saturate(5690%) hue-rotate(12deg) brightness(88%) contrast(87%);
+ 
+   /* Black */
+   --color-6: #000000;
+   --color-6-rgb: #{red(#000000), green(#000000), blue(#000000)};
+   --filter-to-color-6: brightness(0) saturate(100%);
+   
+   /* White */
+   --color-7: #FFFFFF;
+   --color-7-rgb: #{red(#FFFFFF), green(#FFFFFF), blue(#FFFFFF)};
+   --filter-to-color-7: brightness(0) saturate(100%) invert(100%);
+ 
+   /* Warm Grey */
+   --color-8: #F8F4F1;
+   --color-8-rgb: #{red(#F8F4F1), green(#F8F4F1), blue(#F8F4F1)};
+   --filter-to-color-8: brightness(0) saturate(100%) invert(99%) sepia(22%) saturate(1508%) hue-rotate(292deg) brightness(108%) contrast(94%); 
+ 
+   /* Light Grey */
+   --color-9: #F6F6F6;
+   --color-9-rgb: #{red(#F6F6F6), green(#F6F6F6), blue(#F6F6F6)};
+   --filter-to-color-9: brightness(0) saturate(100%) invert(99%) sepia(56%) saturate(331%) hue-rotate(290deg) brightness(111%) contrast(92%);
+ 
+
+  
+  /****************************************************************
+   * LAYOUT SETTINGS
+  ****************************************************************/
+
+  //*** Max widths:
+  --max-width-s: 900px;
+  --max-width-m: 1024px;
+  --max-width-l: 1680px;
+  // min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-s));
+  // min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-m));
+  // min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-l));
+  
+  --fluid-min-width: $fluid-min-width;
+  --fluid-max-width: $fluid-max-width;
+
+  /****************************************************************
+  * SPACING AND GAP
+  ****************************************************************/
+  // Spacing behövs ses över...
+  
+  --viewport-hspace: #{fluid-size(map.get($spacings, "m"), map.get($spacings, "xl"))};
+
+  --spacing-xs-s: #{fluid-size(map.get($spacings, "xs"), map.get($spacings, "s"))};
+  --spacing-xs-m: #{fluid-size(map.get($spacings, "xs"), map.get($spacings, "m"))};
+  --spacing-s-m: #{fluid-size(map.get($spacings, "s"), map.get($spacings, "m"))};
+  --spacing-s-l: #{fluid-size(map.get($spacings, "s"), map.get($spacings, "l"))};
+  --spacing-m-l: #{fluid-size(map.get($spacings, "m"), map.get($spacings, "l"))};
+  --spacing-m-xl: #{fluid-size(map.get($spacings, "m"), map.get($spacings, "xl"))};
+  --spacing-m-2xl: #{fluid-size(map.get($spacings, "m"), map.get($spacings, "2xl"))};
+  --spacing-l-xl: #{fluid-size(map.get($spacings, "l"), map.get($spacings, "xl"))};
+  --spacing-l-2xl: #{fluid-size(map.get($spacings, "l"), map.get($spacings, "2xl"))};
+  --spacing-xl-2xl: #{fluid-size(map.get($spacings, "xl"), map.get($spacings, "2xl"))};
+
+  --page-header-height: #{fluid-size(map.get($spacings, "2xl"), map.get($spacings, "3xl"))};
+  --curve-width: #{fluid-size(48px, 363px)};
+  --swiper-slide-width: #{fluid-size(299px, 411px)};
+
+  // Is it common to have fluid size for logo here and in this way?
+  --logo-max-height: #{fluid-size(28px, 60px)};
+
+  --gap-s: 12px;
+  --gap-m: #{fluid-size(map.get($spacings, "m"), map.get($spacings, "xl"))};//48px;
+  --gap: var(--gap-s);
+
+
+  // --vspace-none: 0px;
+  --vspace-xs: #{map.get($spacings, "xs")};   //12
+  --vspace-s: #{map.get($spacings, "s")};     //16
+  --vspace-m: #{map.get($spacings, "m")};     //24
+  --vspace-l: #{map.get($spacings, "l")};     //32
+  --vspace-xl: #{map.get($spacings, "xl")};   //48
+  --vspace-2xl: #{map.get($spacings, "2xl")}; //96
+  --vspace: #{map.get($spacings, "m")}; 
+}
+
+
+/*********************
+* Color scheme classes *
+*********************/
+:where(.theme) .color-scheme-1                { @extend %color-scheme-1 ;}
+:where(.theme) .color-scheme-2                { @extend %color-scheme-2 ;}
+:where(.theme) .color-scheme-3                { @extend %color-scheme-3 ;}
+:where(.theme) .color-scheme-4                { @extend %color-scheme-4 ;}
+:where(.theme) .color-scheme-5                { @extend %color-scheme-5 ;}
+:where(.theme) .color-scheme-media-background { @extend %color-scheme-media-background; }
+
+/****************************************************************
+  * TYPOGRAPHY classes
+****************************************************************/
+:where(.theme) .font-package--headline-giant  { @extend %font-package--headline-giant; }
+:where(.theme) .font-package--headline-1      { @extend %font-package--headline-1; }
+:where(.theme) .font-package--headline-2      { @extend %font-package--headline-2; }
+:where(.theme) .font-package--headline-3      { @extend %font-package--headline-3; }
+:where(.theme) .font-package--headline-4      { @extend %font-package--headline-4; }
+:where(.theme) .font-package--headline-5      { @extend %font-package--headline-5; }
+:where(.theme) .font-package--headline-6      { @extend %font-package--headline-6; }
+:where(.theme) .font-package--preamble        { @extend %font-package--preamble; }
+:where(.theme) .font-package--body            { @extend %font-package--body; }
+:where(.theme) .font-package--meny            { @extend %font-package--meny; }
+:where(.theme) .font-package--button          { @extend %font-package--button; }
+:where(.theme) .font-package--summary         { @extend %font-package--summary; }
+:where(.theme) .font-package--caption         { @extend %font-package--caption; }
+  
+.theme .css-font-package--headline-giant      { @extend %css-font-package--headline-giant; }
+.theme .css-font-package--headline-1          { @extend %css-font-package--headline-1; }
+.theme .css-font-package--headline-2          { @extend %css-font-package--headline-2; }
+.theme .css-font-package--headline-3          { @extend %css-font-package--headline-3; }
+.theme .css-font-package--headline-4          { @extend %css-font-package--headline-4; }
+.theme .css-font-package--headline-5          { @extend %css-font-package--headline-5; }
+.theme .css-font-package--headline-6          { @extend %css-font-package--headline-6; }
+.theme .css-font-package--preamble            { @extend %css-font-package--preamble; }
+.theme .css-font-package--body                { @extend %css-font-package--body; }
+.theme .css-font-package--meny                { @extend %css-font-package--meny; }
+.theme .css-font-package--button              { @extend %css-font-package--button; }
+.theme .css-font-package--summary             { @extend %css-font-package--summary; }
+.theme .css-font-package--caption             { @extend %css-font-package--caption; }
+
+
+:where(.theme) .font-weight-normal { @extend %font-weight-normal; }
+:where(.theme) .font-weight-bold   { @extend %font-weight-bold; }
+.theme .css-font-weight-normal     { @extend %css-font-weight-normal; }
+.theme .css-font-weight-bold       { @extend %css-font-weight-bold; }
+
+
+/********************** 
+* Global Form styling *
+**********************/
+@media (min-width: 768px) {
+  :where(.theme) form .webform-flexbox {
+    margin-block: 0;
+    margin-inline: calc(var(--spacing-xs-s) / -2);
+  }
+  :where(.theme) form .webform-flex--container {
+    margin: 0 calc(var(--spacing-xs-s) / 2);
+  }
+}
+:where(.theme) form fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+:where(.theme) form select,
+:where(.theme) form input:not([type=checkbox], [type=radio], [type=button], [type=submit]),
+:where(.theme) form textarea {
+  box-sizing: border-box;
+  display: block;
+  padding-block: var(--spacing-xs-s);
+  padding-inline: 0;
+  text-indent: var(--spacing-xs-s);
+  margin-block: 24px;
+  width: 100%;
+  border: 1px solid var(--color-text);
+  font-family: inherit;
+  background: var(--input-field-background);
+  appearance: none;
+  border-radius: 5px;
+}
+:where(.theme) form ::placeholder {
+  color: var(--color-text);
+  opacity: 0.5;
+}
+:where(.theme) form label {
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  margin-block: 0;
+  @extend %css-font-package--summary;
+}
+:where(.theme) form label.form-required::after {
+  content: "*";
+  color: var(--color-1);
+}
+:where(.theme) form label + input[type=email],
+:where(.theme) form label + input[type=tel],
+:where(.theme) form label + input[type=text],
+:where(.theme) form label + textarea {
+  margin-block: 8px var(--spacing-m-l);
+}
+:where(.theme) form .js-form-type-checkbox {
+  display: flex;
+}
+:where(.theme) form input[type=checkbox] {
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  width: 18px;
+}
+
+:where(.theme) form input[type=checkbox] + label {
+  display: inline-flex;
+  text-transform: none;
+}
+
+:where(.theme) form input[type=button],
+:where(.theme) form input[type=submit] {
+  // width: auto;
+  // display: block;
+  // padding: 12px 32px;
+  margin-block: var(--spacing-m-l) 0;
+  // text-decoration: none;
+  // text-transform: var(--text-transform);
+  // font-size: 16px;
+  // line-height: 20px;
+  // position: relative;
+  // isolation: isolate;
+  // justify-self: center;
+  // background: transparent;
+  // border: 0;
+  // background: var(--primary-button-background);
+  // border: 1px solid var(--primary-button-border-color);
+  // color: var(--primary-button-text);
+}
+:where(.theme) form input[type=button]:hover,
+:where(.theme) form input[type=submit]:hover {
+
+}
+
+
+
+
+/******************
+* WYSIWYG-classes *
+*******************/
+:where(.theme) .text-align-left { text-align: left; }
+:where(.theme) .text-align-center { text-align: center; }
+:where(.theme) .text-align-right { text-align: right; }
+
+:where(.theme) .button {
+  display: inline-flex;
+  justify-content: center;
+  padding: 1rem 2rem;
+  padding-top: calc(1rem + 2px);
+  text-decoration: none;
+  text-transform: var(--text-transform);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  font-weight: var(--font-weight);
+  font-family: var(--font-family);
+  box-sizing: border-box;
+  text-decoration: none;
+  position: relative;
+  isolation: isolate;
+  justify-self: center;
+  color: var(--color-text);
+  margin: 0 5px;
+  transform: translateX(-5px);
+  transition: all .2s ease-in-out;
+  background: var(--background);
+  outline: 4px solid transparent;
+  outline-offset: -1px;
+  transition: outline .2s linear;
+  border-radius: 44px;
+  border: none;
+
+  @extend %font-package--button;
+  &:hover {
+    outline-color: var(--outline-color-hover);
+  }
+}
+
+:where(.theme) .button--primary {
+  --color-text: var(--color-6);
+  --outline-color-hover: var(--color-1);
+  --background: var(--color-1);
+}
+
+:where(.theme) .button--naked {
+  --color-text: inherit;
+  --outline-color-hover: transparent;
+  --background: transparent;
+  padding: 0;
+}
+:where(.theme) .button--arrow-right {
+  &::after {
+    transition: transform 0.5s cubic-bezier(0.165,0.84,0.44,1);
+    content: '';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: inherit;
+    background-image: var(--icon-arrow-right);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0 0 0 12px;
+    width: 1.3571428571em;
+    height: 1em;
+    filter: var(--filter);
+    transform: translate(0px, 2px);
+  }
+  &:hover {
+    cursor: pointer;
+    &:after {
+      transform: translate(8px, 2px);
+    }
+  }
+}
+
+
+// Theme global overrides:
+:where(.theme) {
+  font-family: var(--font-family);
+  background: var(--background);
+  color: var(--color-text);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  font-size: var(--font-size);
+
+  a {
+      color: var(--color-link);
+      text-decoration: var(--text-decoration);
+      //HOVER?
+
+      &[href*="linkedin"] {
+        display: flex;
+        align-items: center;
+        &::before {
+          content: '';
+          width: 30px;
+          height: 30px;
+          position: relative;
+          display: inline-flex;
+          background: center / contain var(--icon-linkedin) no-repeat;
+        }
+      }
+
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  button {
+      // Gör denna samtidigt som input[type=submit] samt .button och button--primary/secondary (används i wysiwyg).
+  }
+  
+  p,
+  ul,
+  ol {
+    margin: var(--vspace-m) 0;
+  }
+  code {
+      padding: 2px 4px;
+      background: #eee;
+      border: solid 1px #eef;
+      color: var(--color-2);
+      font-size: 26;
+      margin-block: #{map.get($spacings, "xl")};
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    font-weight: var(--font-weight);
+    letter-spacing: var(--letter-spacing);
+    font-family: var(--font-family);
+    margin-block: var(--vspace-xl) var(--vspace-m);
+    color: var(--heading-color);
+  }
+  h1 { @extend %font-package--headline-1; }
+  h2 { @extend %font-package--headline-2; }
+  h3 { @extend %font-package--headline-3; }
+  h4 { @extend %font-package--headline-4; }
+  h5 { @extend %font-package--headline-5; }
+  h6 { @extend %font-package--headline-6; }
+  :where(.css-font-package--caption) + {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-block: var(--vspace-m) var(--vspace-m);
+    }
+  }
+    
+  //Margin collapse fix
+  .mc1 { margin-block: 500px; }
+  .mc2 { margin-block: -500px; }
+
+  //For video iframes, this class is set by Drupal
+  .media-oembed-content {
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    height: auto;
+  }
+}
+
+.dmc-section {
+  --dmc-section--vspace-start: var(--spacing-xl-2xl);
+  --dmc-section--vspace-end: var(--spacing-xl-2xl);
+  --dmc-section--content-width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  &--outer-space {
+    --dmc-section--margin-block-start: var(--spacing-xl-2xl);
+    --dmc-section--margin-block-end: var(--spacing-xl-2xl);
+  }
+}
+.dmc-section__content-inner { --viewport-hspace: 0px; }
+
+.dmc-section--full-width {
+  --dmc-section--content-width: 100%;
+}
+
+.dmc-panes {
+  --dmc-panes--vspace: var(--spacing-xl-2xl);
+  --dmc-panes--overlay-opacity: 0.4;
+  --dmc-panes--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  &__pane--has-background {
+    --dmc-panes--pane-color-text: var(--color-white);
+    .dmc-panes__pane-background::after {
+      --background: black;
+    }
+  }
+ 
+
+  //Two panes//
+  &--2-panes{
+    --dmc-panes--pane-spacing-block: var(--spacing-xl-2xl);
+    --dmc-panes--pane-spacing-inline: var(--spacing-xl-2xl);
+    --dmc-panes--min-height: min(33vw, 634px);
+    --dmc-panes--pane-background: var(--color-7);
+    .dmc-panes__pane {
+      min-height: 300px;
+    }
+  }
+}
+
+.dmc-panes__pane { --viewport-hspace: 0px; }
+
+.dmc-accordion {
+  --dmc-accordion--width: min(100%, var(--max-width-m, 1024px));
+  --dmc-accordion--border-radius: 4px;
+  --dmc-accordion--button-icon-color: var(--color-3);
+  &[open] {
+    @extend %color-scheme-4;
+    --dmc-accordion--background: var(--color-3);
+    --dmc-accordion--padding-block: 24px;
+    --dmc-accordion--padding-inline: 24px;
+  }
+}
+.dmc-belt + .dmc-accordion {
+  --dmc-accordion--vspace: calc(var(--spacing-xl-2xl) * -1 + 24px) 24px;
+}
+
+.dmc-leaflet {
+  --dmc-leaflet--layout-width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  --dmc-leaflet--content-vspace: var(--spacing-xl-2xl);
+  --dmc-leaflet--layout-vspace: 0;
+  --dmc-leaflet--content-hspace: var(--spacing-xl-2xl);
+  --_outer-vspace: var(--spacing-m-xl);
+  &__layout {
+    grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+  }
+  &__media {
+    @media all and (max-width: 800px) {
+      aspect-ratio: 840 / 512;
+    }
+  } 
+}
+.hepta-page {
+  --hepta-page--header-hspace: var(--spacing-m-2xl);
+  --hepta-page--header-vspace: var(--spacing-m-xl);
+  --hepta-page--header-z-index: 10;
+  body.dmc-navigation-slide-drawer-active & {
+    --hepta-page--header-z-index: 550;
+  }
+}
+.hepta-page__header {
+  // --color-link: var(--color-7);
+  // --filter: var(--filter-to-color-white);
+  @extend %color-scheme-6;
+  --_icon-filter: var(--filter-to-color-white);
+}
+.dmc-navigation {
+  &__slide-drawer {
+    @extend %color-scheme-1;
+  }
+}
+
+.hepta-page--footer {
+  @extend %color-scheme-6;
+}
+.hepta-page--header-on-top:not(.hepta-page--scrolled) {
+  --hepta-page--header-position: fixed;
+  --hepta-page--header-background: transparent;
+  --hepta-page--header-vspace: var(--spacing-m-2xl);
+  --hepta-page--header-height: var(--page-header-height);
+  // @extend %color-scheme-media-background;
+  // --color-link: var(--color-text);
+}
+.hepta-page--scrolled {
+  --hepta-page--header-position: fixed;
+  --hepta-page--header-hspace: var(--spacing-m-2xl);
+  // --hepta-page--header-background: var(--color-6);
+  // --hepta-page--header-color-text: var(--color-7);
+  // --hepta-page--header-branding-color: var(--filter-to-color-white);
+  --hepta-page--header-vspace: 24px;
+  --logo-max-height: 28px;
+}
+.hepta-page--scrolled .hepta-page__header {
+  @extend %color-scheme-6;
+}
+
+.dmc-belt {
+  --dmc-belt--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-m));
+  --dmc-belt--vspace: var(--spacing-xl-2xl);
+}
+.dmc-belt--media {
+  --dmc-belt--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  --dmc-belt--vspace: var(--spacing-m-xl);
+}
+.dmc-belt--small {
+  --dmc-belt--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-s));
+}
+.dmc-belt--right-aligned {
+  --dmc-belt--hspace: auto 0;
+}
+
+// .hepta-hero + .dmc-belt,
+// #block-zeus-theme-content > .dmc-belt:first-child {
+//   --dmc-belt--vspace: var(--spacing-xl-2xl) 0;
+// }
+// #block-zeus-theme-content > .dmc-belt:first-child:last-child {
+//   --dmc-belt--vspace: var(--spacing-xl-2xl);
+// }
+
+.downloadable {
+  @extend %color-scheme-2;
+  --color-link: var(--color-text);
+}
+
+.hepta-hover-card {
+  --width-modifier: hepta-hover-card--wide 800;
+  @extend %color-scheme-3;
+  &__tagline {
+    @extend %css-font-package--caption;
+  }
+  &__heading {
+    @extend %css-font-package--headline-3;
+  }
+  &--wide {
+    --hepta-card--content-text-align: left;
+    &::after {
+      content: '';
+      position: absolute;
+      display: block;
+      width: var(--curve-width);
+      height: 50%;
+      right: 0;
+      top:0;
+      background: left bottom/contain no-repeat var(--curve);
+      z-index: -1;
+      transform: rotate(180deg);
+    }
+    //Added padding-right in content in order not to meet the curve
+    &__content {
+      padding-right: var(--curve-width);
+    }
+  }  
+}
+.hepta-hover-card--has-media {
+  @extend %color-scheme-media-background;
+}
+.hepta-hover-card__hover-content {
+  @extend %color-scheme-5;
+  .button {
+    width: 100%;
+  }
+}
+
+.hepta-card {
+  @extend %color-scheme-2;
+  &__heading {
+    @extend %css-font-package--headline-4;
+  }
+}
+
+.hepta-list {
+  --hepta-list--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  --hepta-list--margin-block-start: var(--spacing-xl-2xl);
+  --hepta-list--margin-block-end: var(--spacing-xl-2xl);
+  &--five-item-grid {
+    @media all and (min-width: 900px) {
+      .hepta-list__item:nth-child(5) {
+        grid-column:  span 2 / auto;
+      }
+    }
+  }
+}
+.views-exposed-form + .hepta-list {
+  --hepta-list--margin-block-start: var(--spacing-m-xl);
+}
+.views-exposed-form {
+  margin-block: var(--spacing-xl-2xl) var(--spacing-m-xl);
+}
+.views-exposed-form {
+  width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  margin-inline: auto;
+  .form-checkboxes,
+  .form-radios {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
+    .form-item {
+      margin: 0;
+      position: relative;
+      display: block;
+      background: #F6F6F6;
+      border: 2px solid #F6F6F6;
+      box-shadow: 0px -1px 40px rgba(0, 0, 0, 0.06);
+      border-radius: 6px;
+      color: inherit;
+      label {
+        padding: 12px 12px 12px 40px;
+      }
+      input {
+        margin: 0px;
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      &:hover {
+        > input {
+          background-color: rgb(0 0 0 / 5%);
+        }
+      }
+    }
+  }
+  .form-checkboxes.form--inline,
+  .form-radios.form--inline {
+    flex-direction: row;
+  }
+}
+
+
+.dmc-section--has-curve {
+  &::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: var(--curve-width);
+    height: 50%;
+    left: 0;
+    bottom:0;
+    background: left bottom/contain no-repeat var(--curve);
+  }
+  .dmc-section__content-inner {
+    padding-inline: var(--curve-width) 0;
+  }
+}
+
+//which min height is preferable if we want to use dmc-section for hero?
+.dmc-section--hero {
+  // --dmc-section--min-height: clamp(743px,56vw,1080px);
+  --dmc-section--min-height: 100vh;
+}
+
+
+.alpha-gallery-carousel {
+  --alpha-gallery-carousel--modal-background: var(--color-9);
+  --alpha-gallery-carousel--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  --hepta-media-with-caption-hover-overlay--vspace: 0;
+  &__modal {
+    --hepta-media-with-caption-hover-overlay--hover-background-opacity: 0;
+    --hepta-media-with-caption-hover-overlay--hover-icon-opacity: 0;
+    .hepta-media-with-caption-hover-overlay__caption {
+      display: none;
+    }
+  }
+}
+
+.alpha-media-with-caption {
+  &--wide {
+    --alpha-media-with-caption--width: min(100%,var(--max-width-l));
+  }
+}
+
+.app-map {
+  --app-map--width: min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-l));
+  --app-map--vspace-start: var(--spacing-xl-2xl);
+  --app-map--vspace-end: var(--spacing-xl-2xl);
+  --app-map--map-min-height: min(100vh, 900px);
+  --app-map--filter-box-width: min(100% - calc(var(--spacing-m-xl) * 2), 319px);
+  --app-map--filter-box-vspace: var(--spacing-m-xl) auto;
+  --app-map--marker-info-width: min(320px, calc(100vw - var(--viewport-hspace) * 4));
+  &__marker {
+    &-info {
+      @extend %color-scheme-5;
+      .button {
+        width: 100%;
+      }
+    }
+  }
+}
+.hepta-document {
+  --hepta-document--width: min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-m));
+  --hepta-document--margin-block-start: 8px;
+  --hepta-document--margin-block-end: 8px;
+  @extend %color-scheme-2;
+}
+// .hepta-hero {
+//   --hepta-hero--margin-block-end: var(--spacing-xl-2xl);
+// }
+.hepta-footer {
+  @extend %color-scheme-6;
+  --hepta-footer--content-width: min(100% - calc(var(--viewport-hspace) * 2), var(--max-width-l)); 
+  --hepta-footer--vspace-start: var(--spacing-xl-2xl);
+  --hepta-footer--vspace-end: var(--spacing-xl-2xl);
+  .dmc-belt {
+    --dmc-belt--width: auto;
+    --dmc-belt--hspace: 0;
+    --dmc-belt--vspace: 0;
+  }
+  nav ul a {
+    @extend %css-font-package--headline-5;
+  }
+  &__main {
+    nav ul ul a {
+      @extend %css-font-package--body;
+    }
+  }
+  select.lang-dropdown-select-element {
+    @extend %css-font-package--headline-5;
+  }
+}
+
+.context-box-toggle-more {
+  --context-box-toggle-more--title-font-size: #{fluid-size(map.get($typography-sizes, "l"), map.get($typography-sizes, "2xl"))};
+  --context-box-toggle-more--icon-down: var(--icon-arrow-down);
+  --context-box-toggle-more--icon-up: var(--icon-arrow-up);
+  --context-box-toggle-more--margin-block: 0;
+  --context-box-toggle-more--padding-inline: 0;
+  &__title {
+    @extend %font-package--headline-3;
+  }
+  --vspace-xl: 0;
+  --vspace-m: var(--spacing-s-l);
+
+  .dmc-belt {
+    --dmc-belt--width: auto;
+    --dmc-belt--vspace: 0;
+    --dmc-belt--hspace: 0;
+  }
+  &__toggle {
+    text-align: left !important;
+    padding: var(--spacing-s-l) 0 0!important;
+    &-text {
+      @extend %css-font-package--button;
+    }
+  }
+}
+
+.hepta-carousel {
+  .hepta-hover-card {
+    --hepta-card--content-min-height: #{fluid-size(320px, 500px)};
+    width: min(411px, 100%);
+  }
+}
+
+.hepta-data-hero {
+  --hepta-data-hero--width: min(100% - var(--viewport-hspace) * 2, var(--max-width-l));
+  --hepta-data-hero--vspace-start: var(--spacing-xl-2xl);
+  --hepta-data-hero--vspace-end: var(--spacing-xl-2xl);;
+  --hepta-data-hero--background: transparent;
+  --hepta-data-hero--content-background: var(--color-6);
+  --hepta-data-hero--color-text: var(--color-7);
+  --hepta-data-hero--min-height: none;
+  --hepta-data-hero--place-content: end center;
+  --hepta-data-hero--margin-block-start: var(--spacing-l-xl);
+  --hepta-data-hero--margin-block-end: var(--spacing-l-xl);
+  // --hepta-data-hero--background-object-fit:;
+  // --hepta-data-hero--background-object-position:;
+  --hepta-data-hero--text-align: center;
+  &--has-background-content {
+    --hepta-data-hero--min-height: clamp(350px, 50vw, 850px);
+  }
+}
+
+.hepta-data {    
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 10px;
+  gap: 32px;
+  padding: 12px;
+  .hepta-data__item {
+    display: flex;
+    font-weight: 700;
+    font-family: var(--font-family-bold);
+    font-size: 18px;
+    line-height: 26px;
+    :last-child {
+      font-family: var(--font-family);
+      font-weight: 400;
+      margin-left: 0.5em;
+    }
+    * {
+      margin: 0;
+    }
+  }
+}
